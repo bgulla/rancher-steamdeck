@@ -1,0 +1,9 @@
+---
+- name: Reboot devices 
+  hosts: cowdeck
+  gather_facts: no
+  become: true
+    
+  tasks:
+    - name: Reboot all REs on the device
+      reboot:

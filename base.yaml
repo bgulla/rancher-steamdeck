@@ -1,0 +1,50 @@
+#!/opt/homebrew/bin/ansible-playbook
+---
+- name:  
+  hosts: cowdeck
+  gather_facts: no
+  become: true
+    
+  tasks:
+
+    # --- Memory
+    - name: Get storage per board
+      shell: "lsblk | grep 'nvme' |  awk '{print $1}'"
+      register: nvme
+      changed_when: False
+
+    - name: Print /boot device
+      debug:
+        msg: "Storage: {{ nvme.stdout }}"
+
+    - name: Get memory per board
+      shell: "free | awk '{print $2}' | sed -n '2 p'"
+      register: mem
+      changed_when: False
+
+    - name: Print current mem
+      debug:
+        msg: "Memory: {{ mem.stdout }}"
+    
+    # DISABLE READONLY
+    - name: DISABLE | read-only
+      shell: "steamos-readonly disable"
+    
+    # Install packages --- requires      ansible-galaxy collection install community.general
+    - name: PKG | update cache 
+      community.general.pacman:
+        update_cache: true
+
+    - name: PKG | install required packages
+      community.general.pacman:
+        name:
+          - k9s
+          - htop
+          - netcat
+          - cowsay
+        state: present
+
+        
+
+
+#sudo pacman-key --populate archlinux 

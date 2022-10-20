@@ -1,0 +1,9 @@
+[all]
+cowdeck
+
+[cowdeck]
+#nuc	ansible_ssh_host=nuc.lark.lol	ansible_connection=ssh	ansible_user=root	ansible_private_key_file="~/.ssh/lab"
+cowdeck	ansible_ssh_host=cowdeck.lark.lol ansible_hostname=cowdeck ansible_sudo_pass="s3cret:)"
+
+
+## TODO create brandon user
