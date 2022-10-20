@@ -1,4 +1,7 @@
 #!/opt/homebrew/bin/ansible-playbook
+
+
+# /rke2.linux-amd64 server --snapshotter=native
 ---
 - name:  
   hosts: cowdeck
@@ -42,9 +45,49 @@
           - htop
           - netcat
           - cowsay
+          - docker # you don't actually need docker but I am including it here if you want to be able to debug
         state: present
 
-        
+    - name: create rke2-lib directory # this has to be done outside of /var because /var is so small on the steamdeck
+      ansible.builtin.file:
+        path: /home/deck/rancher
+        state: directory
+        mode: '0755'
+
+    - name: Create a symbolic link to /var/lib/rancher
+      ansible.builtin.file:
+        src: /home/deck/rancher
+        dest: /var/lib/rancher
+        owner: deck
+        group: deck
+        state: link
+
+
+# download rke2 binary to /usr/local/bin/rke2
+
+    - name: Download rke2-binary
+      ansible.builtin.get_url:
+        url: https://github.com/rancher/rke2/releases/download/v1.22.15%2Brke2r2/rke2.linux-amd64
+        dest: /usr/local/bin/rke2
+        mode: '0755'
+
+    - name: Common | Install rke2 service
+      copy:
+        src: ./roles/steamdeck/files/rke2-server.service
+        dest: "/etc/systemd/system/rke2-server.service"
+
+    - name: RKE2-SERVER | start
+      systemd:
+        state: started
+        daemon_reload: yes
+        name: rke2-server
+
+    - name: Change file ownership, group and permissions
+      ansible.builtin.file:
+        path: /etc/rancher/rke2/rke2.yaml
+        owner: deck
+        group: deck
+        mode: '0644'
 
 
 #sudo pacman-key --populate archlinux 
