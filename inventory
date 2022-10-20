@@ -1,0 +1,8 @@
+[all]
+cowdeck
+
+[cowdeck]
+cowdeck	ansible_ssh_host=cowdeck.lark.lol ansible_hostname=cowdeck ansible_sudo_pass="s3cret:)"
+
+
+## TODO create brandon user
